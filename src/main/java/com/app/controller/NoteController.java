@@ -2,6 +2,7 @@ package com.app.controller;
 
 import com.app.model.Note;
 import com.app.repository.NoteRepository;
+import com.app.repository.NoteRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,45 @@ public class NoteController {
         noteRepository.save(n);
         return "Saved\n";
     }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public @ResponseBody
+    String updateNote(@RequestParam String title,
+                      @RequestParam String content) {
+
+        Note note = noteRepository.findByTitle(title);
+        note.setContent(content);
+        note.setLastModificationDate(Date.getCurrentDate().toString());
+        noteRepository.save(note);
+
+        return "Updated\n";
+    }
+
+    @RequestMapping( method = RequestMethod.DELETE)
+    public @ResponseBody
+    String deleteNote(@RequestParam String title) {
+
+        Note note = noteRepository.findByTitle(title);
+        noteRepository.delete(note);
+
+        return "Deleted\n";
+    }
+
+    @RequestMapping( method = RequestMethod.GET)
+    public @ResponseBody
+    Note getNote(@RequestParam String title) {
+        return noteRepository.findByTitle(title);
+    }
+
+    @RequestMapping( path = "/modMorThan", method = RequestMethod.GET)
+    public @ResponseBody
+    List<Note> getNote(@RequestParam int month) {
+        return noteRepository
+                .findByModificationDate(d ->
+                        Date.dayDifference(Date.getCurrentDate(),d) >= month*30.5
+                );
+    }
+
 
 
     @GetMapping(path = "/all")
