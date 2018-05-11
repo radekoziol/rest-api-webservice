@@ -1,5 +1,6 @@
 package com.app.repository;
 
+import com.app.exceptions.NoSuchNoteException;
 import com.app.model.Note;
 import com.app.model.NoteFactory;
 import com.app.model.date.Date;
@@ -16,13 +17,18 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
     NoteRepository noteRepository;
 
     @Override
-    public List<Note> findNotesBy(Predicate<Note> predicate) {
+    public List<Note> findNotesBy(Predicate<Note> predicate) throws NoSuchNoteException {
 
         List<Note> notes = (List<Note>) noteRepository.findAll();
 
-        return notes.stream()
+        notes = notes.stream()
                 .filter(predicate)
                 .collect(Collectors.toList());
+
+        if (notes.isEmpty())
+            throw new NoSuchNoteException();
+
+        return notes;
     }
 
     @Override
