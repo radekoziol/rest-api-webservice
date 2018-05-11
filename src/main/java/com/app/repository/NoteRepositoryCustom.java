@@ -8,8 +8,8 @@ import java.util.function.Predicate;
 
 public interface NoteRepositoryCustom {
 
-    Note findByTitle(String title);
+    List<Note> findNotesBy(Predicate<Note> predicate);
 
-    List<Note> findByModificationDate(Predicate<Date> predicate);
+    void generateNotes(int number);
 
 }

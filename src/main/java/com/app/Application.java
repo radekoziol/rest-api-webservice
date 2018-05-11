@@ -10,9 +10,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
     ***
     curl -X POST -d "title=Ex2&content=blablablaa2" localhost:8080/notes?
 
+    curl 'localhost:8080/notes/generate?number=5'
+
     curl 'localhost:8080/notes/all'
 
-       curl -X PUT -d "title=Ex2&content=changed!" localhost:8080/notes?
+    curl -X PUT -d "title=Ex2&content=changed!" localhost:8080/notes?
 
 
     curl -X DELETE localhost:8080/notes?title=Ex2

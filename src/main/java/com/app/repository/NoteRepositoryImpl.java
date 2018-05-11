@@ -1,6 +1,7 @@
 package com.app.repository;
 
 import com.app.model.Note;
+import com.app.model.NoteFactory;
 import com.app.model.date.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,18 +16,20 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
     NoteRepository noteRepository;
 
     @Override
-    public Note findByTitle(String title) {
+    public List<Note> findNotesBy(Predicate<Note> predicate) {
+
         List<Note> notes = (List<Note>) noteRepository.findAll();
+
         return notes.stream()
-                .filter(n -> n.getTitle().equals(title))
-                .findFirst().orElseThrow(NoSuchElementException::new);
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Note> findByModificationDate(Predicate<Date> predicate) {
-        List<Note> notes = (List<Note>) noteRepository.findAll();
-        return notes.stream()
-                .filter(n -> predicate.test(new Date(n.getLastModificationDate())))
-                .collect(Collectors.toList());
+    public void generateNotes(int number) {
+
+        NoteFactory noteFactory = new NoteFactory();
+        noteRepository.saveAll(noteFactory.createRandomNotes(number));
+
     }
 }
