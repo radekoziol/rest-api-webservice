@@ -2,6 +2,8 @@ package com.app.model;
 
 import com.app.model.date.Date;
 import com.app.model.note.Note;
+import com.app.repository.NoteRepository;
+import com.app.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,8 @@ public class NoteTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private NoteRepository noteRepository;
 
     @Test
     public void postNotes() throws Exception {
@@ -111,30 +117,48 @@ public class NoteTest {
     @Test
     public void getSortedNotes(){
 
-        // Posting 7 notes within one month
-        restTemplate.
-                postForLocation("http://localhost:8080/notes/generate?number=7", void.class);
+        // Posting 3 notes within one month
+        Note note1 = new Note();
+        note1.setTitle("ex1");
+        note1.setInitialDate("2017-07-01");
+        note1.setLastModificationDate("2017-07-04");
 
-        ResponseEntity<Note[]>  responseEntity = restTemplate.
-                getForEntity("http://localhost:8080/notes/all",
-                        Note[].class);
+        Note note2 = new Note();
+        note2.setTitle("ex2");
+        note2.setInitialDate("2017-06-01");
+        note2.setLastModificationDate("2017-07-01");
 
-        List<Note> notes = Arrays.asList(responseEntity.getBody());
+        Note note3 = new Note();
+        note3.setTitle("ex3");
+        note3.setInitialDate("2017-09-01");
+        note3.setLastModificationDate("2017-10-01");
 
-        // Sorting original dates
-        notes = notes.stream()
-                .sorted((n1,n2) -> Date.dayDifference(
-                        new Date(n1.getInitialDate()),new Date(n2.getInitialDate())))
-                .collect(Collectors.toList());
+
+        // Creating sorted list
+        List<String> sortedNotes = new ArrayList<>();
+        sortedNotes.add(note2.getInitialDate());
+        sortedNotes.add(note1.getInitialDate());
+        sortedNotes.add(note3.getInitialDate());
+
+
+        // Adding them to server
+        NoteService noteService = new NoteService(noteRepository);
+        noteService.addNote(note1);
+        noteService.addNote(note2);
+        noteService.addNote(note3);
+
 
         // Sorting on server
-        responseEntity = restTemplate.
-                getForEntity("http://localhost:8080/notes/page?sortBy=initDate=&sortHow=asc",
+        ResponseEntity<Note[]> responseEntity = restTemplate.
+                getForEntity("http://localhost:8080/notes/page?sortBy=initDate&sortHow=asc",
                         Note[].class);
 
-        List<Note> serverNotes = Arrays.asList(responseEntity.getBody());
+        List<String> serverNotes = Arrays.stream(responseEntity.getBody())
+                .map(Note::getInitialDate)
+                .collect(Collectors.toList());
 
-        assertTrue(notes.equals(serverNotes));
+
+        assertTrue(sortedNotes.equals(serverNotes));
 
 
     }
