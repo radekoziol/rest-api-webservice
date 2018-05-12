@@ -1,10 +1,5 @@
 package com.app.model.date;
 
-import com.app.model.Note;
-import jdk.nashorn.internal.ir.annotations.Ignore;
-import javax.persistence.Transient;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

@@ -1,13 +1,11 @@
 package com.app.repository;
 
 import com.app.exceptions.NoSuchNoteException;
-import com.app.model.Note;
-import com.app.model.NoteFactory;
-import com.app.model.date.Date;
+import com.app.model.note.Note;
+import com.app.model.note.NoteFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

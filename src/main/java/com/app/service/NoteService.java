@@ -1,6 +1,6 @@
 package com.app.service;
 
-import com.app.model.Note;
+import com.app.model.note.Note;
 import com.app.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 

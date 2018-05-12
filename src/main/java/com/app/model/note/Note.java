@@ -1,4 +1,4 @@
-package com.app.model;
+package com.app.model.note;
 
 
 import com.app.model.date.Date;
@@ -17,9 +17,9 @@ public class Note {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
+    @NotNull
     private String title;
     private String content;
-
     private String initialDate;
     private String lastModificationDate;
 

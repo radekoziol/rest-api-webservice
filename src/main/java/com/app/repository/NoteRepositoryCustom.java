@@ -1,8 +1,7 @@
 package com.app.repository;
 
 import com.app.exceptions.NoSuchNoteException;
-import com.app.model.Note;
-import com.app.model.date.Date;
+import com.app.model.note.Note;
 
 import java.util.List;
 import java.util.function.Predicate;

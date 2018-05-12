@@ -1,20 +1,18 @@
 package com.app.api.note.controller;
 
-import com.app.model.Note;
-import com.app.model.NoteFactory;
+import com.app.model.note.Note;
 import com.app.repository.NoteRepository;
-import com.app.repository.NoteRepositoryImpl;
 import com.app.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.app.model.date.Date;
 
-import java.time.Instant;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -29,8 +27,9 @@ public class NoteController {
     private NoteRepository noteRepository;
 
     @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
-    String createNewNote(@RequestParam String title
+    String createNewNote(@RequestParam @NotNull String title
             , @RequestParam String content) {
 
         Note n = new Note();
@@ -38,6 +37,8 @@ public class NoteController {
         n.setContent(content);
         n.setInitialDate(Date.getCurrentDate().toString());
         n.setLastModificationDate(Date.getCurrentDate().toString());
+
+        noteService = new NoteService(noteRepository);
 
         noteService.addNote(n);
         return "Saved\n";
@@ -126,6 +127,7 @@ public class NoteController {
                                 >= days
                 );
     }
+
 
     @GetMapping(path = "/generate")
     public @ResponseBody

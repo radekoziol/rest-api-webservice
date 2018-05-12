@@ -1,4 +1,4 @@
-package com.app.model;
+package com.app.model.note;
 
 import com.app.model.date.Date;
 
@@ -37,7 +37,7 @@ public class NoteFactory {
         note.setInitialDate(getRandomDate());
         note.setLastModificationDate(
                 new Date(note.getInitialDate())
-                        .shiftDate(r.nextInt(66))
+                        .shiftDate(r.nextInt(20))
                         .toString()
         );
 
@@ -52,7 +52,7 @@ public class NoteFactory {
         Random r = new Random();
 
         String day = String.valueOf(r.nextInt(25) + 1);
-        String month = String.valueOf(r.nextInt(10) + 1);
+        String month = String.valueOf(5);
         Date date = new Date("2017",month,day);
 
         return date.toString();
