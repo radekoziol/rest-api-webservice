@@ -24,25 +24,25 @@ Simple RESTful API webservice for managing and storing notes
 ### CRUD methods
 ####  (C) Adds new Note with title = "Example" and content="example"
   ``` bash
-  $ curl -X POST localhost:8080/notes?title=Example&content=example
+  $ curl -X POST 'localhost:8080/notes?title=Example&content=example'
   ```
 ####  (R) Returns note with given title
   ``` bash
-  $ curl -X GET localhost:8080/notes?title=Example
+  $ curl -X GET 'localhost:8080/notes?title=Example'
   ```
 ####  (U) Modifies content of note with title = "Example"
   ``` bash
-  $ curl -X PUT localhost:8080/notes?title=Example&content=changed!
+  $ curl -X PUT 'localhost:8080/notes?title=Example&content=changed!'
   ```
 #### (D) Deletes note with given title
   ``` bash
-  $ curl -X DELETE localhost:8080/notes?title=Example
+  $ curl -X DELETE 'localhost:8080/notes?title=Example'
   ```
 
 ### Additional methods
-####  Generates x notes
+####  Generates x (here 4) notes
   ``` bash
-  $ curl localhost:8080/notes/generate?number=x
+  $ curl 'localhost:8080/notes/generate?number=4'
   ```
 ####  Returns sorted (sortBy=asc or sortBy=des) notes based on condition (sortHow):
   * sort by title -> sortHow=title
@@ -50,9 +50,9 @@ Simple RESTful API webservice for managing and storing notes
   * sort by modification date -> sortHow=modDate
   * sort by initial commit date -> sortHow=initDate
   ``` bash
-  $ curl localhost:8080/notes/page?sortBy=asc&sortHow=modDate
+  $ curl 'localhost:8080/notes/page?sortBy=asc&sortHow=modDate'
   ```
-####  Returns notes that were not modified for x days
+####  Returns notes that were not modified for x (here 32) days
   ``` bash
-  $ curl localhost:8080/notes/modMorThan?days=x
+  $ curl 'localhost:8080/notes/modMorThan?days=32'
   ```
