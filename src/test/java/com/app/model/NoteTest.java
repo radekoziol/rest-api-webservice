@@ -1,25 +1,23 @@
 package com.app.model;
 
-import com.app.model.date.Date;
 import com.app.model.note.Note;
 import com.app.repository.NoteRepository;
 import com.app.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureMockMvc
 public class NoteTest {
@@ -40,6 +38,8 @@ public class NoteTest {
 
     @Test
     public void postNotes() throws Exception {
+
+        noteRepository.deleteAll();
 
         // Random example
         ResponseEntity<String> response = restTemplate.
@@ -65,6 +65,8 @@ public class NoteTest {
 
     @Test
     public void updateNotes() {
+
+        noteRepository.deleteAll();
 
         // Posting
         restTemplate.
@@ -95,8 +97,9 @@ public class NoteTest {
     }
 
     @Test
-    public void deleteNotes(){
+    public void deleteNotes() {
 
+        noteRepository.deleteAll();
         // Posting
         restTemplate.
                 postForEntity("http://localhost:8080/notes?title=Ex1&content=ex1", "Saved", String.class);
@@ -115,7 +118,9 @@ public class NoteTest {
     }
 
     @Test
-    public void getSortedNotes(){
+    public void getSortedNotes() {
+
+        noteRepository.deleteAll();
 
         // Posting 3 notes within one month
         Note note1 = new Note();
@@ -157,12 +162,15 @@ public class NoteTest {
                 .map(Note::getInitialDate)
                 .collect(Collectors.toList());
 
+        System.out.println(serverNotes);
+        System.out.println(sortedNotes);
+
+
 
         assertTrue(sortedNotes.equals(serverNotes));
 
 
     }
-
 
 
 }
