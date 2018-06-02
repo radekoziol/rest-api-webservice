@@ -1,5 +1,6 @@
 package com.app.api.note.controller;
 
+import com.app.exceptions.NoSuchNoteException;
 import com.app.model.note.Note;
 import com.app.repository.NoteRepository;
 import com.app.service.NoteService;
@@ -16,7 +17,6 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping(path = "/notes")
 public class NoteController {
 
     private NoteService noteService;
@@ -26,7 +26,7 @@ public class NoteController {
     @Autowired
     private NoteRepository noteRepository;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(path = "/note", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
     String createNewNote(@RequestParam @NotNull String title
@@ -44,12 +44,14 @@ public class NoteController {
         return "Saved\n";
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(path = "/note/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String updateNote(@RequestParam String title,
+    String updateNote(@PathVariable long id,
                       @RequestParam String content) {
 
-        Note note = noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+        Note note = noteRepository.findById(id)
+            .orElseThrow(NoSuchNoteException::new);
+
         note.setContent(content);
         note.setLastModificationDate(Date.getCurrentDate().toString());
         noteRepository.save(note);
@@ -57,23 +59,55 @@ public class NoteController {
         return "Updated\n";
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
-    public @ResponseBody
-    String deleteNote(@RequestParam String title) {
+//    @RequestMapping(path = "/note/{title}", method = RequestMethod.PUT)
+//    public @ResponseBody
+//    String updateNoteByTitle(@PathVariable String title,
+//                      @RequestParam String content) {
+//
+//        Note note = noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+//        note.setContent(content);
+//        note.setLastModificationDate(Date.getCurrentDate().toString());
+//        noteRepository.save(note);
+//
+//        return "Updated\n";
+//    }
 
-        Note note = noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+//    @RequestMapping(path = "/note/{title}", method = RequestMethod.DELETE)
+//    public @ResponseBody
+//    String deleteNoteByTitle(@PathVariable String title) {
+//
+//        Note note = noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+//        noteRepository.delete(note);
+//
+//        return "Deleted\n";
+//    }
+
+    @RequestMapping(path = "/note/{id}", method = RequestMethod.DELETE)
+    public @ResponseBody
+    String deleteNote(@PathVariable long id) {
+
+        Note note = noteRepository.findById(id)
+                .orElseThrow(NoSuchNoteException::new);
+
         noteRepository.delete(note);
 
         return "Deleted\n";
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+//    @RequestMapping(path = "/note/{title}", method = RequestMethod.GET)
+//    public @ResponseBody
+//    Note getNoteByTitle(@PathVariable String title) {
+//        return noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+//    }
+
+    @RequestMapping(path = "/note/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    Note getNote(@RequestParam String title) {
-        return noteRepository.findNotesBy(n -> n.getTitle().equals(title)).get(0);
+    Note getNoteById(@PathVariable long id) {
+        return noteRepository.findById(id)
+                .orElseThrow(NoSuchNoteException::new);
     }
 
-    @RequestMapping(path = "/page", method = RequestMethod.GET)
+    @RequestMapping(path = "notes/page", method = RequestMethod.GET)
     public @ResponseBody
     List<Note> getSortedNotes(@RequestParam String sortBy,
                               @RequestParam String sortHow) {
@@ -117,7 +151,7 @@ public class NoteController {
     }
 
 
-    @RequestMapping(path = "/modMorThan", method = RequestMethod.GET)
+    @RequestMapping(path = "/mod_mor_than", method = RequestMethod.GET)
     public @ResponseBody
     List<Note> getNotes(@RequestParam int days) {
         return noteRepository
@@ -129,7 +163,7 @@ public class NoteController {
     }
 
 
-    @GetMapping(path = "/generate")
+    @GetMapping(path = "notes/generate")
     public @ResponseBody
     String generateNotes(@RequestParam int number) {
         noteRepository.generateNotes(number);
@@ -137,7 +171,7 @@ public class NoteController {
     }
 
 
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/notes")
     public @ResponseBody
     Iterable<Note> getAllNotes() {
         return noteRepository.findAll();

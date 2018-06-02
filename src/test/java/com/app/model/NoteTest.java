@@ -1,14 +1,19 @@
 package com.app.model;
 
+import com.app.exceptions.NoSuchNoteException;
 import com.app.model.note.Note;
 import com.app.repository.NoteRepository;
 import com.app.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,29 +41,37 @@ public class NoteTest {
     @Autowired
     private NoteRepository noteRepository;
 
-    @Test
-    public void postNotes() throws Exception {
+    private ResponseEntity<String> response;
 
-        noteRepository.deleteAll();
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+
+    @Before
+    public void createNotes(){
 
         // Random example
-        ResponseEntity<String> response = restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex&content=ex", "Saved", String.class);
-        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+        response = restTemplate.
+                postForEntity("http://localhost:8080/note?title=Ex1&content=ex", "Saved", String.class);
 
         // Empty content
         response = restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex&content=", "Saved", String.class);
-        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+                postForEntity("http://localhost:8080/note?title=Ex2&content=", "Saved", String.class);
+
+    }
+
+
+    @Test
+    public void postNotes() throws Exception {
 
         // Null title
         response = restTemplate.
-                postForEntity("http://localhost:8080/notes?content=ex", "Saved", String.class);
+                postForEntity("http://localhost:8080/note?content=ex", "Saved", String.class);
         assertThat(response.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
 
         // Wrong args
         response = restTemplate.
-                postForEntity("http://localhost:8080/notes?tit1e=&content=", "Saved", String.class);
+                postForEntity("http://localhost:8080/note?tit1e=&content=", "Saved", String.class);
         assertThat(response.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
 
     }
@@ -66,54 +79,30 @@ public class NoteTest {
     @Test
     public void updateNotes() {
 
-        noteRepository.deleteAll();
-
-        // Posting
-        restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex1&content=ex1", "Saved", String.class);
-
-        restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex2&content=blabla", "Saved", String.class);
-
         // Updating
         restTemplate.
-                put("http://localhost:8080/notes?title=Ex1&content=blabla", "Updated", String.class);
+                put("http://localhost:8080/note/1?content=updated!", "Updated", String.class);
 
-        restTemplate.
-                put("http://localhost:8080/notes?title=Ex2&content=blabla", "Updated", String.class);
-
-        ResponseEntity<Note> response1 = restTemplate.getForEntity(
-                "http://localhost:8080/notes?title=Ex1", Note.class);
-
-        ResponseEntity<Note> response2 = restTemplate.getForEntity(
-                "http://localhost:8080/notes?title=Ex2", Note.class);
-
-        ObjectMapper mapper = new ObjectMapper();
+        ResponseEntity<Note> response = restTemplate.getForEntity(
+                "http://localhost:8080/note/1", Note.class);
 
         assertTrue(
-                response1.getBody().getContent()
-                        .equals(response2.getBody().getContent()));
-
+                response.getBody().getContent()
+                        .equals("updated!"));
     }
 
     @Test
     public void deleteNotes() {
 
-        noteRepository.deleteAll();
-        // Posting
-        restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex1&content=ex1", "Saved", String.class);
-
-        restTemplate.
-                postForEntity("http://localhost:8080/notes?title=Ex1&content=blabla", "Saved", String.class);
-
         // Deleting
-        restTemplate.delete("http://localhost:8080/notes?title=Ex1");
+        restTemplate.delete("http://localhost:8080/note/2");
 
-        ResponseEntity<Note> response2 = restTemplate.getForEntity(
-                "http://localhost:8080/notes?title=Ex1", Note.class);
+        try{
+            restTemplate.getForEntity(
+                    "http://localhost:8080/note/2", Note.class);
+        }catch (NoSuchNoteException ex){
 
-        assertTrue(response2.getBody().getContent().equals("blabla"));
+        }
 
     }
 
